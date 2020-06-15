@@ -60,7 +60,7 @@ static NUM_STRINGS: [&str; 100] = [
 
 pub fn sort_strings(c: &mut Criterion) {
     let mut group = c.benchmark_group("Random strings");
-    group.bench_function("sort 100 strings lexically + naturaly", |b| {
+    group.bench_function("sort lexically + naturaly", |b| {
         b.iter_with_large_setup(
             || black_box(STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -69,7 +69,7 @@ pub fn sort_strings(c: &mut Criterion) {
             },
         );
     });
-    group.bench_function("sort 100 strings lexically", |b| {
+    group.bench_function("sort lexically", |b| {
         b.iter_with_large_setup(
             || black_box(STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -78,7 +78,7 @@ pub fn sort_strings(c: &mut Criterion) {
             },
         );
     });
-    group.bench_function("sort 100 strings alphanumerically", |b| {
+    group.bench_function("sort alphanumerically", |b| {
         b.iter_with_large_setup(
             || black_box(STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -87,7 +87,7 @@ pub fn sort_strings(c: &mut Criterion) {
             },
         );
     });
-    group.bench_function("sort 100 strings natively", |b| {
+    group.bench_function("sort natively", |b| {
         b.iter_with_large_setup(
             || black_box(STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -101,7 +101,7 @@ pub fn sort_strings(c: &mut Criterion) {
 
 pub fn sort_numbers(c: &mut Criterion) {
     let mut group = c.benchmark_group("Strings with numbers");
-    group.bench_function("sort 100 numeric strings lexically + naturaly", |b| {
+    group.bench_function("sort lexically + naturaly", |b| {
         b.iter_with_large_setup(
             || black_box(NUM_STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -110,7 +110,7 @@ pub fn sort_numbers(c: &mut Criterion) {
             },
         );
     });
-    group.bench_function("sort 100 numeric strings lexically", |b| {
+    group.bench_function("sort lexically", |b| {
         b.iter_with_large_setup(
             || black_box(NUM_STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -119,7 +119,7 @@ pub fn sort_numbers(c: &mut Criterion) {
             },
         );
     });
-    group.bench_function("sort 100 numeric strings alphanumerically", |b| {
+    group.bench_function("sort alphanumerically", |b| {
         b.iter_with_large_setup(
             || black_box(NUM_STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -128,7 +128,7 @@ pub fn sort_numbers(c: &mut Criterion) {
             },
         );
     });
-    group.bench_function("sort 100 numeric strings natively", |b| {
+    group.bench_function("sort natively", |b| {
         b.iter_with_large_setup(
             || black_box(NUM_STRINGS.clone()),
             |strings: [&str; 100]| {
