@@ -12,13 +12,11 @@ include = ["src/*", "Cargo.toml", "README.md"]
 edition = "2018"
 
 keywords = [
-  "emoji",
   "Unicode",
   "ASCII",
   "transliteration",
   "lexical",
   "sort",
-  "compare",
 ]
 license = "BSD-3-Clause"
 
