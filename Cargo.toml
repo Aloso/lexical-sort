@@ -1,0 +1,28 @@
+[package]
+name = "lexical-sort"
+version = "0.1.0"
+authors = ["Ludwig Stecher <ludwig.stecher@gmx.de>"]
+description = "Sort Unicode strings lexically"
+categories = ["text-processing", "internationalization"]
+documentation = "https://docs.rs/lexical-sort"
+homepage = "https://lib.rs/crates/lexical-sort"
+repository = "https://github.com/Aloso/lexical-sort"
+readme = "README.md"
+include = ["src/*", "Cargo.toml", "README.md"]
+edition = "2018"
+
+keywords = [
+  "emoji",
+  "Unicode",
+  "ASCII",
+  "transliteration",
+  "lexical",
+  "sort",
+  "compare",
+]
+license = "BSD-3-Clause"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+deunicode = "1.1.1"
