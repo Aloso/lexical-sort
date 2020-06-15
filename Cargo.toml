@@ -31,4 +31,5 @@ alphanumeric-sort = "1.1"
 
 [[bench]]
 name = "bench_sorting"
+path = "benches/bench_sorting.rs"
 harness = false
