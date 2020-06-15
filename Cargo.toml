@@ -18,9 +18,17 @@ keywords = [
   "lexical",
   "sort",
 ]
-license = "BSD-3-Clause"
+license = "MIT OR Apache 2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-deunicode = "1.1.1"
+any_ascii = "0.1.5"
+
+[dev-dependencies]
+criterion = "0.3"
+alphanumeric-sort = "1.1"
+
+[[bench]]
+name = "bench_sorting"
+harness = false

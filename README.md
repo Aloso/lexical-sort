@@ -33,11 +33,12 @@ To just compare two strings, use the `lexical_cmp` or `lexical_natural_cmp` func
 Contributions, bug reports and feature requests are welcome!
 
 If support for certain characters is missing, you can contribute them to the
-[deunicode](https://github.com/kornelski/deunicode) crate.
+[any_ascii](https://github.com/hunterwb/any-ascii) crate.
 
 Let me know if you want to use this in `no_std`. It's certainly possible to add `no_std` support
 to this crate and its dependencies.
 
 ## License
 
-This project is licensed under the BSD-3-Clause license.
+This project is dual-licensed under the **MIT** and **Apache 2.0** license.
+Use whichever you prefer.

@@ -7,7 +7,7 @@
 //! The iterators don't allocate memory on the heap. I haven't benchmarked it,
 //! but I believe that it's quite efficient.
 
-use deunicode::deunicode_char;
+use any_ascii::any_ascii_char;
 use std::iter::FusedIterator;
 
 /// An iterator over one `char`, converted to lowercase
@@ -123,15 +123,19 @@ impl DoubleEndedIterator for LexicalChar {
 /// and transliterated to ASCII, if it is alphanumeric
 #[inline]
 pub fn iterate_lexical_char(c: char) -> LexicalChar {
-    if c.is_alphanumeric() {
-        match deunicode_char(c) {
-            Some(s) => LexicalChar::from_slice(s.as_bytes()),
-            None => LexicalChar::from_char(c),
-        }
-    } else if combining_diacritical(&c) {
-        LexicalChar::empty()
+    if c.is_ascii() {
+        LexicalChar::from_char(c.to_ascii_lowercase())
     } else {
-        LexicalChar::from_char(c)
+        if c.is_alphanumeric() {
+            match any_ascii_char(c) {
+                "" => LexicalChar::from_char(c),
+                s => LexicalChar::from_slice(s.as_bytes()),
+            }
+        } else if combining_diacritical(&c) {
+            LexicalChar::empty()
+        } else {
+            LexicalChar::from_char(c)
+        }
     }
 }
 
@@ -155,10 +159,10 @@ fn test_iteration() {
 
     assert_eq!(&it("Hello, world!"), "hello, world!");
     assert_eq!(&it("Ω A æ b ö ß é"), "o a ae b o ss e");
-    assert_eq!(&it("3½/⅝ £ → € ®™"), "31/2/ 5/8  £ → € ®™");
+    assert_eq!(&it("3½/⅝ £ → € ®™"), "31/2/5/8 £ → € ®™");
     assert_eq!(&it("»@« 15% ¡¹!"), "»@« 15% ¡1!");
     assert_eq!(&it("🎉🦄☣"), "🎉🦄☣");
-    assert_eq!(&it("北亰"), "bei jing ");
+    assert_eq!(&it("北亰"), "beijing");
     assert_eq!(&it("ΣΣΣ"), "sss");
     assert_eq!(&it("à"), "a"); // 'a' with combining diacritical mark '\u{300}'
 }
