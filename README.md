@@ -45,25 +45,16 @@ crate – which is still impressive, considering the complexity of the algorithm
 
 ### Benchmarks
 
-These benchmarks compare
+These benchmarks were executed on an AMD A8-7600 Radeon R7 CPU with 4x 3.1GHz.
 
- - alphanumeric sort (`alphanumeric-sort` crate)
- - lexical sort (`lexical-sort` crate)
- - lexical + natural sort (`lexical-sort` crate)
- - native sort (standard library)
-
-They were executed on an AMD A8-7600 Radeon R7 CPU with 4x 3.1GHz.
-
-The following benchmark sorts 100 randomly generated strings. Each string is 5 to 20 characters long
-and can contain ASCII letters, digits, special characters and various alphanumeric, non-ASCII
+The benchmark on the left sorts 100 randomly generated strings. Each string is 5 to 20 characters
+long and can contain ASCII letters, digits, special characters and various alphanumeric, non-ASCII
 characters. Several of them need to be transliterated to multiple ASCII characters (e.g. `ß`, `æ`):
 
-![Violin graph](./docs/Random_strings.svg)
+The benchmark on the right sorts 100 randomly generated strings. Each string consists of `"T-"`
+followed by 1 to 8 decimal digits:
 
-The following benchmark sorts 100 randomly generated strings. Each string consists of `"T-"`
-followed 1 to 8 decimal digits:
-
-![Violin graph](./docs/Numeric_strings.svg)
+![Diagrams](./docs/Diagrams.png)
 
 ## Contributing
 
