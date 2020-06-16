@@ -60,25 +60,17 @@ static NUM_STRINGS: [&str; 100] = [
 
 pub fn sort_strings(c: &mut Criterion) {
     let mut group = c.benchmark_group("Random strings");
-    group.bench_function("sort lexically + naturaly", |b| {
+
+    group.bench_function("native (std)", |b| {
         b.iter_with_large_setup(
             || black_box(STRINGS.clone()),
             |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(true);
+                black_box(strings).sort();
                 strings
             },
         );
     });
-    group.bench_function("sort lexically", |b| {
-        b.iter_with_large_setup(
-            || black_box(STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(false);
-                strings
-            },
-        );
-    });
-    group.bench_function("sort alphanumerically", |b| {
+    group.bench_function("natural (alphanumerical-sort)", |b| {
         b.iter_with_large_setup(
             || black_box(STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -87,11 +79,29 @@ pub fn sort_strings(c: &mut Criterion) {
             },
         );
     });
-    group.bench_function("sort natively", |b| {
+    group.bench_function("natural (lexical-sort)", |b| {
         b.iter_with_large_setup(
             || black_box(STRINGS.clone()),
             |strings: [&str; 100]| {
-                black_box(strings).sort();
+                black_box(strings).sort_by(|lhs, rhs| lexical_sort::natural_cmp(lhs, rhs));
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings).lexical_sort(false);
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical + natural (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings).lexical_sort(true);
                 strings
             },
         );
@@ -101,25 +111,17 @@ pub fn sort_strings(c: &mut Criterion) {
 
 pub fn sort_numbers(c: &mut Criterion) {
     let mut group = c.benchmark_group("Strings with numbers");
-    group.bench_function("sort lexically + naturaly", |b| {
+
+    group.bench_function("native (std)", |b| {
         b.iter_with_large_setup(
             || black_box(NUM_STRINGS.clone()),
             |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(true);
+                black_box(strings).sort();
                 strings
             },
         );
     });
-    group.bench_function("sort lexically", |b| {
-        b.iter_with_large_setup(
-            || black_box(NUM_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(false);
-                strings
-            },
-        );
-    });
-    group.bench_function("sort alphanumerically", |b| {
+    group.bench_function("natural (alphanumerical-sort)", |b| {
         b.iter_with_large_setup(
             || black_box(NUM_STRINGS.clone()),
             |strings: [&str; 100]| {
@@ -128,11 +130,29 @@ pub fn sort_numbers(c: &mut Criterion) {
             },
         );
     });
-    group.bench_function("sort natively", |b| {
+    group.bench_function("natural (lexical-sort)", |b| {
         b.iter_with_large_setup(
             || black_box(NUM_STRINGS.clone()),
             |strings: [&str; 100]| {
-                black_box(strings).sort();
+                black_box(strings).sort_by(|lhs, rhs| lexical_sort::natural_cmp(lhs, rhs));
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(NUM_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings).lexical_sort(false);
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical + natural (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(NUM_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings).lexical_sort(true);
                 strings
             },
         );

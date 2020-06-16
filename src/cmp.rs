@@ -1,6 +1,5 @@
 use crate::iter::iterate_lexical;
 use core::cmp::Ordering;
-use std::iter::Peekable;
 
 pub fn lexical_cmp(lhs: &str, rhs: &str) -> Ordering {
     let mut iter1 = iterate_lexical(lhs);
@@ -37,11 +36,23 @@ pub fn lexical_natural_cmp(lhs: &str, rhs: &str) -> Ordering {
         match (iter1.next(), iter2.next()) {
             (Some(lhs), Some(rhs)) => {
                 if lhs.is_ascii_digit() && rhs.is_ascii_digit() {
-                    let lhs = consume_integer(lhs, &mut iter1);
-                    let rhs = consume_integer(rhs, &mut iter2);
-
-                    if lhs != rhs {
-                        return lhs.cmp(&rhs);
+                    loop {
+                        match (
+                            iter1.peek().copied().filter(|c| c.is_ascii_digit()),
+                            iter2.peek().copied().filter(|c| c.is_ascii_digit()),
+                        ) {
+                            (Some(lhs), Some(rhs)) => {
+                                if lhs != rhs {
+                                    return lhs.cmp(&rhs);
+                                } else {
+                                    let _ = iter1.next();
+                                    let _ = iter2.next();
+                                }
+                            }
+                            (Some(_), None) => return Ordering::Greater,
+                            (None, Some(_)) => return Ordering::Less,
+                            (None, None) => break,
+                        }
                     }
                 } else if lhs != rhs {
                     let is_left_alnum = lhs.is_alphanumeric();
@@ -63,25 +74,41 @@ pub fn lexical_natural_cmp(lhs: &str, rhs: &str) -> Ordering {
     }
 }
 
-#[inline]
-fn char_to_digit(c: char) -> u64 {
-    c as u64 - '0' as u64
-}
+pub fn natural_cmp(lhs: &str, rhs: &str) -> Ordering {
+    let mut iter1 = lhs.chars().peekable();
+    let mut iter2 = rhs.chars().peekable();
 
-#[inline]
-fn consume_integer(first_digit: char, iter: &mut Peekable<impl Iterator<Item = char>>) -> u64 {
-    let mut n = char_to_digit(first_digit);
-
-    while let Some(&p) = iter.peek() {
-        if p.is_ascii_digit() {
-            n = n * 10 + char_to_digit(p);
-            iter.next();
-        } else {
-            break;
+    loop {
+        match (iter1.next(), iter2.next()) {
+            (Some(lhs), Some(rhs)) => {
+                if lhs.is_ascii_digit() && rhs.is_ascii_digit() {
+                    loop {
+                        match (
+                            iter1.peek().copied().filter(char::is_ascii_digit),
+                            iter2.peek().copied().filter(char::is_ascii_digit),
+                        ) {
+                            (Some(lhs), Some(rhs)) => {
+                                if lhs != rhs {
+                                    return lhs.cmp(&rhs);
+                                } else {
+                                    let _ = iter1.next();
+                                    let _ = iter2.next();
+                                }
+                            }
+                            (Some(_), None) => return Ordering::Greater,
+                            (None, Some(_)) => return Ordering::Less,
+                            (None, None) => break,
+                        }
+                    }
+                } else if lhs != rhs {
+                    return lhs.cmp(&rhs);
+                }
+            }
+            (Some(_), None) => return Ordering::Greater,
+            (None, Some(_)) => return Ordering::Less,
+            (None, None) => return Ordering::Equal,
         }
     }
-
-    n
 }
 
 #[test]

@@ -29,11 +29,15 @@
 mod cmp;
 pub mod iter;
 
-pub use cmp::{lexical_cmp, lexical_natural_cmp};
+pub use cmp::{lexical_cmp, lexical_natural_cmp, natural_cmp};
 
 use std::{
     borrow::Cow,
+    ffi::{CStr, CString, OsStr, OsString},
+    fs::DirEntry,
     path::{Path, PathBuf},
+    rc::Rc,
+    sync::Arc,
 };
 
 /// This trait adds functionality to slices containing strings or file paths
@@ -77,8 +81,10 @@ impl_for_str!([&'_ str]);
 impl_for_str!([String]);
 impl_for_str!([Cow<'_, str>]);
 impl_for_str!([Box<str>]);
+impl_for_str!([Rc<str>]);
+impl_for_str!([Arc<str>]);
 
-macro_rules! impl_for_path {
+macro_rules! impl_for_path_or_ffi {
     ($t:ty) => {
         impl LexicalSort for $t {
             #[inline]
@@ -110,10 +116,66 @@ macro_rules! impl_for_path {
     };
 }
 
-impl_for_path!([&'_ Path]);
-impl_for_path!([PathBuf]);
-impl_for_path!([Cow<'_, Path>]);
-impl_for_path!([Box<Path>]);
+impl_for_path_or_ffi!([&'_ Path]);
+impl_for_path_or_ffi!([PathBuf]);
+impl_for_path_or_ffi!([Cow<'_, Path>]);
+impl_for_path_or_ffi!([Box<Path>]);
+impl_for_path_or_ffi!([Rc<Path>]);
+impl_for_path_or_ffi!([Arc<Path>]);
+
+impl LexicalSort for [DirEntry] {
+    #[inline]
+    fn lexical_sort(&mut self, natural: bool) {
+        if natural {
+            self.sort_by(|lhs, rhs| {
+                lexical_natural_cmp(
+                    &lhs.file_name().to_string_lossy(),
+                    &rhs.file_name().to_string_lossy(),
+                )
+            });
+        } else {
+            self.sort_by(|lhs, rhs| {
+                lexical_cmp(
+                    &lhs.file_name().to_string_lossy(),
+                    &rhs.file_name().to_string_lossy(),
+                )
+            });
+        }
+    }
+
+    #[inline]
+    fn unstable_lexical_sort(&mut self, natural: bool) {
+        if natural {
+            self.sort_unstable_by(|lhs, rhs| {
+                lexical_natural_cmp(
+                    &lhs.file_name().to_string_lossy(),
+                    &rhs.file_name().to_string_lossy(),
+                )
+            });
+        } else {
+            self.sort_unstable_by(|lhs, rhs| {
+                lexical_cmp(
+                    &lhs.file_name().to_string_lossy(),
+                    &rhs.file_name().to_string_lossy(),
+                )
+            });
+        }
+    }
+}
+
+impl_for_path_or_ffi!([&'_ OsStr]);
+impl_for_path_or_ffi!([OsString]);
+impl_for_path_or_ffi!([Cow<'_, OsStr>]);
+impl_for_path_or_ffi!([Box<OsStr>]);
+impl_for_path_or_ffi!([Rc<OsStr>]);
+impl_for_path_or_ffi!([Arc<OsStr>]);
+
+impl_for_path_or_ffi!([&'_ CStr]);
+impl_for_path_or_ffi!([CString]);
+impl_for_path_or_ffi!([Cow<'_, CStr>]);
+impl_for_path_or_ffi!([Box<CStr>]);
+impl_for_path_or_ffi!([Rc<CStr>]);
+impl_for_path_or_ffi!([Arc<CStr>]);
 
 #[test]
 fn test_sort() {
