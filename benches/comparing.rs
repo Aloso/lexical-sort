@@ -1,8 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use lexical_sort::{
-    lexical_cmp, lexical_only_alnum_cmp, natural_cmp, natural_lexical_cmp,
-    natural_lexical_only_alnum_cmp,
-};
+use lexical_sort::CmpStrings;
 use std::cmp::Ordering;
 
 // 100 auto-generated strings with a length between 5 and 20 characters
@@ -101,7 +98,7 @@ static ASCII_STRINGS: [&str; 100] = [
 ];
 
 #[inline(always)]
-fn for_all<F: Fn(&str, &str) -> Ordering>(arr: &[&str; 100], f: F) {
+fn for_all<'a, F: Fn(&'a str, &'a str) -> Ordering>(arr: &[&'a str; 100], f: F) {
     for i in 0..100_usize {
         for j in (i..100).skip(1) {
             let l = black_box(arr[i]);
@@ -121,19 +118,19 @@ pub fn compare_strings(c: &mut Criterion) {
         b.iter(|| for_all(&STRINGS, |l, r| alphanumeric_sort::compare_str(l, r)));
     });
     group.bench_function("natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&STRINGS, natural_cmp));
+        b.iter(|| for_all(&STRINGS, CmpStrings::natural_cmp));
     });
     group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter(|| for_all(&STRINGS, lexical_cmp));
+        b.iter(|| for_all(&STRINGS, CmpStrings::lexical_cmp));
     });
     group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&STRINGS, natural_lexical_cmp));
+        b.iter(|| for_all(&STRINGS, CmpStrings::natural_lexical_cmp));
     });
     group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&STRINGS, lexical_only_alnum_cmp));
+        b.iter(|| for_all(&STRINGS, CmpStrings::lexical_only_alnum_cmp));
     });
     group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&STRINGS, natural_lexical_only_alnum_cmp));
+        b.iter(|| for_all(&STRINGS, CmpStrings::natural_lexical_only_alnum_cmp));
     });
 
     group.finish();
@@ -149,19 +146,19 @@ pub fn compare_numbers(c: &mut Criterion) {
         b.iter(|| for_all(&NUM_STRINGS, |l, r| alphanumeric_sort::compare_str(l, r)));
     });
     group.bench_function("natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&NUM_STRINGS, natural_cmp));
+        b.iter(|| for_all(&NUM_STRINGS, CmpStrings::natural_cmp));
     });
     group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter(|| for_all(&NUM_STRINGS, lexical_cmp));
+        b.iter(|| for_all(&NUM_STRINGS, CmpStrings::lexical_cmp));
     });
     group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&NUM_STRINGS, natural_lexical_cmp));
+        b.iter(|| for_all(&NUM_STRINGS, CmpStrings::natural_lexical_cmp));
     });
     group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&NUM_STRINGS, lexical_only_alnum_cmp));
+        b.iter(|| for_all(&NUM_STRINGS, CmpStrings::lexical_only_alnum_cmp));
     });
     group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&NUM_STRINGS, natural_lexical_only_alnum_cmp));
+        b.iter(|| for_all(&NUM_STRINGS, CmpStrings::natural_lexical_only_alnum_cmp));
     });
 
     group.finish();
@@ -177,19 +174,19 @@ pub fn compare_ascii(c: &mut Criterion) {
         b.iter(|| for_all(&ASCII_STRINGS, |l, r| alphanumeric_sort::compare_str(l, r)));
     });
     group.bench_function("natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&ASCII_STRINGS, natural_cmp));
+        b.iter(|| for_all(&ASCII_STRINGS, CmpStrings::natural_cmp));
     });
     group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter(|| for_all(&ASCII_STRINGS, lexical_cmp));
+        b.iter(|| for_all(&ASCII_STRINGS, CmpStrings::lexical_cmp));
     });
     group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&ASCII_STRINGS, natural_lexical_cmp));
+        b.iter(|| for_all(&ASCII_STRINGS, CmpStrings::natural_lexical_cmp));
     });
     group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&ASCII_STRINGS, lexical_only_alnum_cmp));
+        b.iter(|| for_all(&ASCII_STRINGS, CmpStrings::lexical_only_alnum_cmp));
     });
     group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&ASCII_STRINGS, natural_lexical_only_alnum_cmp));
+        b.iter(|| for_all(&ASCII_STRINGS, CmpStrings::natural_lexical_only_alnum_cmp));
     });
 
     group.finish();
