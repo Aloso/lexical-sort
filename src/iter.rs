@@ -13,7 +13,8 @@ use std::iter::FusedIterator;
 /// An iterator over one `char`, converted to lowercase
 /// and transliterated to ASCII, if it is an alphanumeric character
 ///
-/// This iterator can be created by calling `iterate_lexical_char()`
+/// This iterator can be created by calling `iterate_lexical_char()` or
+/// `iterate_lexical_char_only_alnum()`
 pub struct LexicalChar(CharOrSlice);
 
 impl LexicalChar {
@@ -140,7 +141,7 @@ pub fn iterate_lexical_char(c: char) -> LexicalChar {
 /// Returns an iterator over one `char`, converted to lowercase
 /// and transliterated to ASCII, if it is alphanumeric
 #[inline]
-pub fn iterate_lexical_char_only_alphanum(c: char) -> LexicalChar {
+pub fn iterate_lexical_char_only_alnum(c: char) -> LexicalChar {
     if c.is_ascii() {
         if c.is_ascii_alphanumeric() {
             LexicalChar::from_char(c.to_ascii_lowercase())
@@ -170,9 +171,9 @@ pub fn iterate_lexical(s: &'_ str) -> impl Iterator<Item = char> + '_ {
 }
 
 /// Returns an iterator over the characters of a string, converted to lowercase
-/// and transliterated to ASCII. non-alphanumeric characters are skipped
+/// and transliterated to ASCII. Non-alphanumeric characters are skipped
 pub fn iterate_lexical_only_alnum(s: &'_ str) -> impl Iterator<Item = char> + '_ {
-    s.chars().flat_map(iterate_lexical_char_only_alphanum)
+    s.chars().flat_map(iterate_lexical_char_only_alnum)
 }
 
 #[test]

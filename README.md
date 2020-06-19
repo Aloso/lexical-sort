@@ -21,19 +21,19 @@ reasonably well for a wide range of locales at a minimal performance cost.
 
 ## Usage
 
-To sort strings or paths, you can use the `LexicalSort` trait:
+To sort strings or paths, you can use the `CmpString` or `CmpPaths` trait:
 
 ```rust
-use lexical_sort::LexicalSort;
+use lexical_sort::CmpString;
 
 let mut strings = vec!["ß", "é", "100", "hello", "world", "50", ".", "B!"];
 
-strings.lexical_sort(/* enable natural sorting: */ true);
+strings.sort_unstable_by(|l, r| l.natural_lexical_cmp(r));
 assert_eq!(&strings, &[".", "50", "100", "B!", "é", "hello", "ß", "world"]);
 ```
 
-To just compare two strings, use the `natural_cmp`, `lexical_cmp`, `lexical_natural_cmp`,
-`lexical_cmp_only_alnum` or `lexical_natural_cmp_only_alnum` function.
+Alternatively, you can use the `natural_cmp`, `lexical_cmp`, `lexical_natural_cmp`,
+`lexical_cmp_only_alnum` and `lexical_natural_cmp_only_alnum` free functions.
 
 ## Characteristics
 
@@ -54,14 +54,14 @@ Note that comparisons are slower for strings where many characters at the start 
 
 These benchmarks were executed on an AMD A8-7600 Radeon R7 CPU with 4x 3.1GHz.
 
-The benchmark on the left sorts 100 randomly generated strings with 5 to 20 characters, containing
-both ASCII and non-ASCII characters. Several of them need to be transliterated to multiple
-characters (e.g. `ß`, `æ`).
+The benchmark on the left compares 100 randomly generated strings with 5 to 20 characters,
+containing both ASCII and non-ASCII characters. Several of them need to be transliterated
+to multiple characters (e.g. `ß`, `æ`).
 
-The benchmark in the middle also sorts 100 randomly generated strings with 5 to 20 characters, but
-they are ASCII-only.
+The benchmark in the middle also comparse 100 randomly generated strings with 5 to 20 characters,
+but they are ASCII-only.
 
-The benchmark on the right sorts 100 randomly generated strings. Each string consists of `"T-"`
+The benchmark on the right comparse 100 randomly generated strings. Each string consists of `"T-"`
 followed by 1 to 8 decimal digits. This is a stress test for natural sorting.
 
 ![Diagrams](./docs/Diagrams.png)

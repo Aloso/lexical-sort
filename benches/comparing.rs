@@ -1,5 +1,9 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use lexical_sort::LexicalSort;
+use lexical_sort::{
+    lexical_cmp, lexical_only_alnum_cmp, natural_cmp, natural_lexical_cmp,
+    natural_lexical_only_alnum_cmp,
+};
+use std::cmp::Ordering;
 
 // 100 auto-generated strings with a length between 5 and 20 characters
 //
@@ -96,218 +100,100 @@ static ASCII_STRINGS: [&str; 100] = [
     "elvdTcu.uf+a_W?Rd\\j", "VN4r>2E6<v(esGn", "EBcp*BMN;$lDsn", "]6muXiTau+K)y",
 ];
 
-pub fn sort_strings(c: &mut Criterion) {
+#[inline(always)]
+fn for_all<F: Fn(&str, &str) -> Ordering>(arr: &[&str; 100], f: F) {
+    for i in 0..100_usize {
+        for j in (i..100).skip(1) {
+            let l = black_box(arr[i]);
+            let r = black_box(arr[j]);
+            black_box(f(l, r));
+        }
+    }
+}
+
+pub fn compare_strings(c: &mut Criterion) {
     let mut group = c.benchmark_group("Random strings");
 
     group.bench_function("native (std)", |b| {
-        b.iter_with_large_setup(
-            || black_box(STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).sort();
-                strings
-            },
-        );
+        b.iter(|| for_all(&STRINGS, str::cmp));
     });
     group.bench_function("natural (alphanumerical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(STRINGS.clone()),
-            |strings: [&str; 100]| {
-                alphanumeric_sort::sort_str_slice(&mut black_box(strings));
-                strings
-            },
-        );
+        b.iter(|| for_all(&STRINGS, |l, r| alphanumeric_sort::compare_str(l, r)));
     });
     group.bench_function("natural (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).sort_by(|lhs, rhs| lexical_sort::natural_cmp(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&STRINGS, natural_cmp));
     });
     group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(false);
-                strings
-            },
-        );
+        b.iter(|| for_all(&STRINGS, lexical_cmp));
     });
     group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(true);
-                strings
-            },
-        );
+        b.iter(|| for_all(&STRINGS, natural_lexical_cmp));
     });
     group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings)
-                    .sort_by(|lhs, rhs| lexical_sort::lexical_cmp_only_alnum(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&STRINGS, lexical_only_alnum_cmp));
     });
     group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings)
-                    .sort_by(|lhs, rhs| lexical_sort::lexical_natural_cmp_only_alnum(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&STRINGS, natural_lexical_only_alnum_cmp));
     });
+
     group.finish();
 }
 
-pub fn sort_numbers(c: &mut Criterion) {
+pub fn compare_numbers(c: &mut Criterion) {
     let mut group = c.benchmark_group("Strings with numbers");
 
     group.bench_function("native (std)", |b| {
-        b.iter_with_large_setup(
-            || black_box(NUM_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).sort();
-                strings
-            },
-        );
+        b.iter(|| for_all(&NUM_STRINGS, str::cmp));
     });
     group.bench_function("natural (alphanumerical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(NUM_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                alphanumeric_sort::sort_str_slice(&mut black_box(strings));
-                strings
-            },
-        );
+        b.iter(|| for_all(&NUM_STRINGS, |l, r| alphanumeric_sort::compare_str(l, r)));
     });
     group.bench_function("natural (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(NUM_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).sort_by(|lhs, rhs| lexical_sort::natural_cmp(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&NUM_STRINGS, natural_cmp));
     });
     group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(NUM_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(false);
-                strings
-            },
-        );
+        b.iter(|| for_all(&NUM_STRINGS, lexical_cmp));
     });
     group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(NUM_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(true);
-                strings
-            },
-        );
+        b.iter(|| for_all(&NUM_STRINGS, natural_lexical_cmp));
     });
     group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(NUM_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings)
-                    .sort_by(|lhs, rhs| lexical_sort::lexical_cmp_only_alnum(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&NUM_STRINGS, lexical_only_alnum_cmp));
     });
     group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(NUM_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings)
-                    .sort_by(|lhs, rhs| lexical_sort::lexical_natural_cmp_only_alnum(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&NUM_STRINGS, natural_lexical_only_alnum_cmp));
     });
+
     group.finish();
 }
 
-pub fn sort_ascii(c: &mut Criterion) {
+pub fn compare_ascii(c: &mut Criterion) {
     let mut group = c.benchmark_group("ASCII strings");
 
     group.bench_function("native (std)", |b| {
-        b.iter_with_large_setup(
-            || black_box(ASCII_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).sort();
-                strings
-            },
-        );
+        b.iter(|| for_all(&ASCII_STRINGS, str::cmp));
     });
     group.bench_function("natural (alphanumerical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(ASCII_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                alphanumeric_sort::sort_str_slice(&mut black_box(strings));
-                strings
-            },
-        );
+        b.iter(|| for_all(&ASCII_STRINGS, |l, r| alphanumeric_sort::compare_str(l, r)));
     });
     group.bench_function("natural (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(ASCII_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).sort_by(|lhs, rhs| lexical_sort::natural_cmp(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&ASCII_STRINGS, natural_cmp));
     });
     group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(ASCII_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(false);
-                strings
-            },
-        );
+        b.iter(|| for_all(&ASCII_STRINGS, lexical_cmp));
     });
     group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(ASCII_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings).lexical_sort(true);
-                strings
-            },
-        );
+        b.iter(|| for_all(&ASCII_STRINGS, natural_lexical_cmp));
     });
     group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(ASCII_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings)
-                    .sort_by(|lhs, rhs| lexical_sort::lexical_cmp_only_alnum(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&ASCII_STRINGS, lexical_only_alnum_cmp));
     });
     group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter_with_large_setup(
-            || black_box(ASCII_STRINGS.clone()),
-            |strings: [&str; 100]| {
-                black_box(strings)
-                    .sort_by(|lhs, rhs| lexical_sort::lexical_natural_cmp_only_alnum(lhs, rhs));
-                strings
-            },
-        );
+        b.iter(|| for_all(&ASCII_STRINGS, natural_lexical_only_alnum_cmp));
     });
+
     group.finish();
 }
 
-criterion_group!(sorting, sort_strings, sort_ascii, sort_numbers);
-criterion_main!(sorting);
+criterion_group!(comparing, compare_strings, compare_ascii, compare_numbers);
+criterion_main!(comparing);

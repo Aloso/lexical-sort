@@ -50,6 +50,7 @@ fn ret_ordering(lhs: char, rhs: char) -> Ordering {
     result
 }
 
+/// Compares two strings lexicographically
 pub fn lexical_cmp(lhs: &str, rhs: &str) -> Ordering {
     let mut iter1 = iterate_lexical(lhs);
     let mut iter2 = iterate_lexical(rhs);
@@ -68,7 +69,8 @@ pub fn lexical_cmp(lhs: &str, rhs: &str) -> Ordering {
     }
 }
 
-pub fn lexical_cmp_only_alnum(s1: &str, s2: &str) -> Ordering {
+/// Compares two strings lexicographically, skipping characters that aren't alphanumeric
+pub fn lexical_only_alnum_cmp(s1: &str, s2: &str) -> Ordering {
     let mut iter1 = iterate_lexical_only_alnum(s1);
     let mut iter2 = iterate_lexical_only_alnum(s2);
 
@@ -86,7 +88,8 @@ pub fn lexical_cmp_only_alnum(s1: &str, s2: &str) -> Ordering {
     }
 }
 
-pub fn lexical_natural_cmp(s1: &str, s2: &str) -> Ordering {
+/// Compares two strings naturally and lexicographically
+pub fn natural_lexical_cmp(s1: &str, s2: &str) -> Ordering {
     let mut iter1 = iterate_lexical(s1).peekable();
     let mut iter2 = iterate_lexical(s2).peekable();
 
@@ -106,7 +109,9 @@ pub fn lexical_natural_cmp(s1: &str, s2: &str) -> Ordering {
     }
 }
 
-pub fn lexical_natural_cmp_only_alnum(s1: &str, s2: &str) -> Ordering {
+/// Compares two strings naturally and lexicographically, skipping characters that aren't
+/// alphanumeric
+pub fn natural_lexical_only_alnum_cmp(s1: &str, s2: &str) -> Ordering {
     let mut iter1 = iterate_lexical_only_alnum(s1).peekable();
     let mut iter2 = iterate_lexical_only_alnum(s2).peekable();
 
@@ -126,6 +131,7 @@ pub fn lexical_natural_cmp_only_alnum(s1: &str, s2: &str) -> Ordering {
     }
 }
 
+/// Compares two strings naturally
 pub fn natural_cmp(s1: &str, s2: &str) -> Ordering {
     let mut iter1 = s1.chars().peekable();
     let mut iter2 = s2.chars().peekable();
@@ -157,10 +163,10 @@ fn test_comparison() {
     }
 
     fn nat_ordered(lhs: &str, rhs: &str) {
-        let success = lexical_natural_cmp(lhs, rhs) == Ordering::Less;
+        let success = natural_lexical_cmp(lhs, rhs) == Ordering::Less;
         assert!(success, "Natural comparison {:?} < {:?} failed", lhs, rhs);
 
-        let success = lexical_natural_cmp(rhs, lhs) == Ordering::Greater;
+        let success = natural_lexical_cmp(rhs, lhs) == Ordering::Greater;
         assert!(success, "Lexical comparison {:?} > {:?} failed", rhs, lhs);
     }
 
@@ -196,18 +202,18 @@ fn test_comparison() {
 #[test]
 fn test_comparison_only_alnum() {
     fn ordered(lhs: &str, rhs: &str) {
-        let success = lexical_cmp_only_alnum(lhs, rhs) == Ordering::Less;
+        let success = lexical_only_alnum_cmp(lhs, rhs) == Ordering::Less;
         assert!(success, "Lexical comparison {:?} < {:?} failed", lhs, rhs);
 
-        let success = lexical_cmp_only_alnum(rhs, lhs) == Ordering::Greater;
+        let success = lexical_only_alnum_cmp(rhs, lhs) == Ordering::Greater;
         assert!(success, "Lexical comparison {:?} > {:?} failed", rhs, lhs);
     }
 
     fn nat_ordered(lhs: &str, rhs: &str) {
-        let success = lexical_natural_cmp_only_alnum(lhs, rhs) == Ordering::Less;
+        let success = natural_lexical_only_alnum_cmp(lhs, rhs) == Ordering::Less;
         assert!(success, "Natural comparison {:?} < {:?} failed", lhs, rhs);
 
-        let success = lexical_natural_cmp_only_alnum(rhs, lhs) == Ordering::Greater;
+        let success = natural_lexical_only_alnum_cmp(rhs, lhs) == Ordering::Greater;
         assert!(success, "Lexical comparison {:?} > {:?} failed", rhs, lhs);
     }
 
