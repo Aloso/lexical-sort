@@ -58,6 +58,44 @@ static NUM_STRINGS: [&str; 100] = [
     "T-114", "T-40716", "T-145243",
 ];
 
+// 100 auto-generated ASCII-only strings with a length between 5 and 20 characters
+//
+// Half of them have another string with a common prefix:
+//  - 50 strings whose first character is unique
+//  - 12 pairs with a common prefix of length 1
+//  - 6 pairs with a common prefix of length 2
+//  - 2 pairs with a common prefix of length 3
+//  - 2 pairs with a common prefix of length 4
+//  - 2 pairs with a common prefix of length 6
+//  - 1 pair with a common prefix of length 10 ("/l>Wvr<QV oaR", "/l>Wvr<QV |dv")
+//
+// The strings are shuffled randomly.
+#[rustfmt::skip]
+static ASCII_STRINGS: [&str; 100] = [
+    "D'4e8uejiI\\P2-k", "f Yu|us 0oZH\"0 (\"3a", "\"uo%m", "[;}c-pw]?a*;4nf!rl",
+    "\"usZj9;", "@)?38D:on\\ecm", "VM)k8R;U7exTnHo", "o&oui elo&aJjSX1,C", "W9F\\a",
+    "2AnesdlTIei6V[h{Bnl", "AItIamru\\ x d", "tjnKB8a}Aqd>x8", "!duS ",
+    "UfP6ej+j;H+Ssoizi", "aVb\\74#", "Xam^o:xm0l] mk2aM'", ";)Y2e", "yhmm['H^;aUqetA",
+    ">sz@k?4u86sll2ZL", "P]([eGAocueN@+c%", "rovnD?)se", "Ffss \"0MFcPqo# KX8",
+    ";)Ya)+i", ")Je6ush", "'ni.T8z.jzi;26age", "G*rMwN<f<5", "rE7mFm:kk# e&u XoaJ",
+    "8oxso", "R }o5TlBn  hu y", "#h{eonvw,", "p dm#{i;q_", "bNeoxs:KR5u|a{4x",
+    "k4bt\\JJnz]Ncp/Tef", "55N ]j|o2P0#}H", "DRwY#48(>/Ku w", "M:2pX88",
+    "h ^e08TI.)TK", "'f6eh6", "jhM8rdi", "{8nVo", "7uP;}B", "+|1E!LWstxDGLM+X^",
+    "Es|^4t)l", "WnF +lnF[iity\"Idc", "f Yu|u4", "if#QhodMf0e@}i", "uso t,", "mY c*2",
+    ",U u?#4PN)T$G!e", "XaN<a1JDAutlfhSe", "Oein{q`bI@8Ut2&e)i", "{8_4uALXy moawe3Vz",
+    "|'{2;\"", "%QcF<y] 84g44u", "czmQila ", "cz8J$", "IdnihN@iQmVtuT,",
+    "jhM8rdilDaw5#lofh/k", "/l>Wvr<QV oaR", "za7IaK 8eR\"?t", "4U; icn#|dnf)o",
+    "-s0ok", "*Pevdve6g[|H0c{xRf", "&bs2LmAdFrd]n2l", "<m73 ", "G*rMiue",
+    "u'r?jseh|aIyfhe", " Gg49ozfr}K<uH0?n", "01Sneh%KQ`|", "k4Wna1.UnUA",
+    "nPi{#@VGvS&", "ChFci|osP0=an0Qrh\\n", "\\(Ptlm*Lca", "!duGhCs91Iio4sbgZ>m",
+    "#Bkv+i%6 qi8  ivl{", "3o0SXbo", "[;$_!;m4ylij`un-L", "su,Eu2Natgi S66zmT",
+    "TC[p5hdfht{zrEi", "_z5ahCaN4XSS3", "7uP;WAPFf@'4q<m", "Bs588", "/l>Wvr<QV |dv",
+    "Hl<aREd`_e2o@Bo", "d2-JsoSOnom](", "v%XYZ", "}nc9K$;", "+iCjAP uf)vh?s",
+    "$%`\\0`sr!sPI@2s", "g04sEt),oEql1efs4", "IikiM\"kQ2zqA9V)<u", "i;^5:n^6",
+    "62#lw{5o", "=buf2noe8wzdBT", "q`5cl8F]-4e_ DnK", "&#6/]`\\:hDsk",
+    "elvdTcu.uf+a_W?Rd\\j", "VN4r>2E6<v(esGn", "EBcp*BMN;$lDsn", "]6muXiTau+K)y",
+];
+
 pub fn sort_strings(c: &mut Criterion) {
     let mut group = c.benchmark_group("Random strings");
 
@@ -102,6 +140,26 @@ pub fn sort_strings(c: &mut Criterion) {
             || black_box(STRINGS.clone()),
             |strings: [&str; 100]| {
                 black_box(strings).lexical_sort(true);
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings)
+                    .sort_by(|lhs, rhs| lexical_sort::lexical_cmp_only_alnum(lhs, rhs));
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings)
+                    .sort_by(|lhs, rhs| lexical_sort::lexical_natural_cmp_only_alnum(lhs, rhs));
                 strings
             },
         );
@@ -157,8 +215,99 @@ pub fn sort_numbers(c: &mut Criterion) {
             },
         );
     });
+    group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(NUM_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings)
+                    .sort_by(|lhs, rhs| lexical_sort::lexical_cmp_only_alnum(lhs, rhs));
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(NUM_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings)
+                    .sort_by(|lhs, rhs| lexical_sort::lexical_natural_cmp_only_alnum(lhs, rhs));
+                strings
+            },
+        );
+    });
     group.finish();
 }
 
-criterion_group!(sorting, sort_strings, sort_numbers);
+pub fn sort_ascii(c: &mut Criterion) {
+    let mut group = c.benchmark_group("ASCII strings");
+
+    group.bench_function("native (std)", |b| {
+        b.iter_with_large_setup(
+            || black_box(ASCII_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings).sort();
+                strings
+            },
+        );
+    });
+    group.bench_function("natural (alphanumerical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(ASCII_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                alphanumeric_sort::sort_str_slice(&mut black_box(strings));
+                strings
+            },
+        );
+    });
+    group.bench_function("natural (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(ASCII_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings).sort_by(|lhs, rhs| lexical_sort::natural_cmp(lhs, rhs));
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(ASCII_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings).lexical_sort(false);
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical + natural (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(ASCII_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings).lexical_sort(true);
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(ASCII_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings)
+                    .sort_by(|lhs, rhs| lexical_sort::lexical_cmp_only_alnum(lhs, rhs));
+                strings
+            },
+        );
+    });
+    group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
+        b.iter_with_large_setup(
+            || black_box(ASCII_STRINGS.clone()),
+            |strings: [&str; 100]| {
+                black_box(strings)
+                    .sort_by(|lhs, rhs| lexical_sort::lexical_natural_cmp_only_alnum(lhs, rhs));
+                strings
+            },
+        );
+    });
+    group.finish();
+}
+
+criterion_group!(sorting, sort_strings, sort_ascii, sort_numbers);
 criterion_main!(sorting);

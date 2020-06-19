@@ -15,7 +15,7 @@ keywords = [
   "Unicode",
   "ASCII",
   "transliteration",
-  "lexical",
+  "lexicographical",
   "sort",
 ]
 license = "MIT OR Apache-2.0"

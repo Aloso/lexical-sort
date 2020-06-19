@@ -1,19 +1,25 @@
-//! This is a library to sort strings (or file paths) **lexically**. This means that non-ASCII
-//! characters such as `á` or `ß` are treated like their closest ASCII character: `á` is treated
-//! as `a`, `ß` is treated as `ss`.
+//! This is a library to sort strings (or file paths) **lexicographically**. This means that
+//! non-ASCII characters such as `á` or `ß` are treated like their closest ASCII character: `á` is
+//! treated as `a`, `ß` is treated as `ss`, etc.
 //!
 //! The sort is case-insensitive. Alphanumeric characters are sorted after all other characters
 //! (punctuation, whitespace, special characters, emojis, ...).
 //!
 //! It is possible to enable **natural sorting**, which also handles ASCII numbers. For example,
-//! `50` is sorted before `100` with natural sorting turned on.
+//! `50` is less than `100` with natural sorting turned on. It's also possible to skip
+//! characters that aren't alphanumeric, so e.g. `f-5` is next to `f5`.
 //!
-//! If different strings have the same ASCII representation (e.g. `"Foo"` and `"fóò"`), we fall
-//! back to the default implementation, which just compares Unicode code points.
+//! If different strings have the same ASCII representation (e.g. `"Foo"` and `"fóò"`), it
+//! falls back to the default method from the standard library, so sorting is deterministic.
+//!
+//! <table><tr><td>
+//! <b>NOTE</b>: This crate doesn't attempt to be correct for every locale, but it should work
+//! reasonably well for a wide range of locales at a minimal performance cost.
+//! </td></tr></table>
 //!
 //! ## Usage
 //!
-//! To sort strings or paths, use the `LexicalSort` trait:
+//! To sort strings or paths, you can use the `LexicalSort` trait:
 //!
 //! ```rust
 //! use lexical_sort::LexicalSort;
@@ -24,12 +30,16 @@
 //! assert_eq!(&strings, &[".", "50", "100", "B!", "é", "hello", "ß", "world"]);
 //! ```
 //!
-//! To just compare two strings, use the `lexical_cmp` or `lexical_natural_cmp` function.
+//! To just compare two strings, use the `natural_cmp`, `lexical_cmp`, `lexical_natural_cmp`,
+//! `lexical_cmp_only_alnum` or `lexical_natural_cmp_only_alnum` function.
 
 mod cmp;
 pub mod iter;
 
-pub use cmp::{lexical_cmp, lexical_natural_cmp, natural_cmp};
+pub use cmp::{
+    lexical_cmp, lexical_cmp_only_alnum, lexical_natural_cmp, lexical_natural_cmp_only_alnum,
+    natural_cmp,
+};
 
 use std::{
     borrow::Cow,

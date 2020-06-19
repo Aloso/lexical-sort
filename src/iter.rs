@@ -125,17 +125,35 @@ impl DoubleEndedIterator for LexicalChar {
 pub fn iterate_lexical_char(c: char) -> LexicalChar {
     if c.is_ascii() {
         LexicalChar::from_char(c.to_ascii_lowercase())
-    } else {
-        if c.is_alphanumeric() {
-            match any_ascii_char(c) {
-                "" => LexicalChar::from_char(c),
-                s => LexicalChar::from_slice(s.as_bytes()),
-            }
-        } else if combining_diacritical(&c) {
-            LexicalChar::empty()
-        } else {
-            LexicalChar::from_char(c)
+    } else if c.is_alphanumeric() {
+        match any_ascii_char(c) {
+            s if s.is_empty() => LexicalChar::from_char(c),
+            s => LexicalChar::from_slice(s.as_bytes()),
         }
+    } else if combining_diacritical(&c) {
+        LexicalChar::empty()
+    } else {
+        LexicalChar::from_char(c)
+    }
+}
+
+/// Returns an iterator over one `char`, converted to lowercase
+/// and transliterated to ASCII, if it is alphanumeric
+#[inline]
+pub fn iterate_lexical_char_only_alphanum(c: char) -> LexicalChar {
+    if c.is_ascii() {
+        if c.is_ascii_alphanumeric() {
+            LexicalChar::from_char(c.to_ascii_lowercase())
+        } else {
+            LexicalChar::empty()
+        }
+    } else if c.is_alphanumeric() {
+        match any_ascii_char(c) {
+            s if s.is_empty() => LexicalChar::from_char(c),
+            s => LexicalChar::from_slice(s.as_bytes()),
+        }
+    } else {
+        LexicalChar::empty()
     }
 }
 
@@ -151,6 +169,12 @@ pub fn iterate_lexical(s: &'_ str) -> impl Iterator<Item = char> + '_ {
     s.chars().flat_map(iterate_lexical_char)
 }
 
+/// Returns an iterator over the characters of a string, converted to lowercase
+/// and transliterated to ASCII. non-alphanumeric characters are skipped
+pub fn iterate_lexical_only_alnum(s: &'_ str) -> impl Iterator<Item = char> + '_ {
+    s.chars().flat_map(iterate_lexical_char_only_alphanum)
+}
+
 #[test]
 fn test_iteration() {
     fn it(s: &'static str) -> String {
@@ -162,6 +186,22 @@ fn test_iteration() {
     assert_eq!(&it("3½/⅝ £ → € ®™"), "31/2/5/8 £ → € ®™");
     assert_eq!(&it("»@« 15% ¡¹!"), "»@« 15% ¡1!");
     assert_eq!(&it("🎉🦄☣"), "🎉🦄☣");
+    assert_eq!(&it("北亰"), "beijing");
+    assert_eq!(&it("ΣΣΣ"), "sss");
+    assert_eq!(&it("à"), "a"); // 'a' with combining diacritical mark '\u{300}'
+}
+
+#[test]
+fn test_iteration_only_alnum() {
+    fn it(s: &'static str) -> String {
+        iterate_lexical_only_alnum(s).collect()
+    }
+
+    assert_eq!(&it("Hello, world!"), "helloworld");
+    assert_eq!(&it("Ω A æ b ö ß é"), "oaaebosse");
+    assert_eq!(&it("3½/⅝ £ → € ®™"), "31/25/8");
+    assert_eq!(&it("»@« 15% ¡¹!"), "151");
+    assert_eq!(&it("🎉🦄☣"), "");
     assert_eq!(&it("北亰"), "beijing");
     assert_eq!(&it("ΣΣΣ"), "sss");
     assert_eq!(&it("à"), "a"); // 'a' with combining diacritical mark '\u{300}'
