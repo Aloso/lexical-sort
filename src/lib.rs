@@ -48,10 +48,20 @@ use std::{cmp::Ordering, path::Path};
 ///
 /// See the [module-level documentation](./index.html) for more information.
 pub trait CmpStrings {
+    /// Compares two strings naturally
     fn natural_cmp(self, other: Self) -> Ordering;
+
+    /// Compares two strings lexicographically
     fn lexical_cmp(self, other: Self) -> Ordering;
+
+    /// Compares two strings naturally and lexicographically
     fn natural_lexical_cmp(self, other: Self) -> Ordering;
+
+    /// Compares two strings lexicographically, skipping characters that aren't alphanumeric
     fn lexical_only_alnum_cmp(self, other: Self) -> Ordering;
+
+    /// Compares two strings naturally and lexicographically, skipping characters that aren't
+    /// alphanumeric
     fn natural_lexical_only_alnum_cmp(self, other: Self) -> Ordering;
 }
 
@@ -87,10 +97,20 @@ impl<A: AsRef<str>> CmpStrings for A {
 ///
 /// See the [module-level documentation](./index.html) for more information.
 pub trait CmpPaths {
+    /// Compares two strings naturally
     fn natural_cmp(self, other: Self) -> Ordering;
+
+    /// Compares two strings lexicographically
     fn lexical_cmp(self, other: Self) -> Ordering;
+
+    /// Compares two strings naturally and lexicographically
     fn natural_lexical_cmp(self, other: Self) -> Ordering;
+
+    /// Compares two strings lexicographically, skipping characters that aren't alphanumeric
     fn lexical_only_alnum_cmp(self, other: Self) -> Ordering;
+
+    /// Compares two strings naturally and lexicographically, skipping characters that aren't
+    /// alphanumeric
     fn natural_lexical_only_alnum_cmp(self, other: Self) -> Ordering;
 }
 
