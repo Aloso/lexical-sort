@@ -1,6 +1,6 @@
 [package]
 name = "lexical-sort"
-version = "0.3.0-pre.1"
+version = "0.3.0"
 authors = ["Ludwig Stecher <ludwig.stecher@gmx.de>"]
 description = "Sort Unicode strings lexically"
 categories = ["text-processing", "internationalization"]

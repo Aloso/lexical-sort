@@ -205,6 +205,27 @@ pub fn only_alnum_cmp(s1: &str, s2: &str) -> Ordering {
     }
 }
 
+/// Compares strings (not lexicographically or naturally, doesn't skip non-alphanumeric characters)
+///
+/// For example, `"B" < "a" < "b" < "ä"`
+pub fn cmp(s1: &str, s2: &str) -> Ordering {
+    let mut iter1 = s1.chars();
+    let mut iter2 = s2.chars();
+
+    loop {
+        match (iter1.next(), iter2.next()) {
+            (Some(lhs), Some(rhs)) => {
+                if lhs != rhs {
+                    return lhs.cmp(&rhs);
+                }
+            }
+            (Some(_), None) => return Ordering::Greater,
+            (None, Some(_)) => return Ordering::Less,
+            (None, None) => return Ordering::Equal,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -217,6 +238,20 @@ mod tests {
             let success = algo(rhs, lhs) == Ordering::Greater;
             assert!(success, "{} comparison {:?} > {:?} failed", desc, rhs, lhs);
         }
+    }
+
+    #[test]
+    fn test_cmp() {
+        let ordered = make_test("Cmp", cmp);
+
+        ordered("aaa", "aaaa");
+        ordered("aaa", "aab");
+        ordered("AAb", "aaa");
+        ordered("aab", "äáa");
+        ordered("aaa", "äáb");
+
+        ordered("T-20", "T-5");
+        ordered("T-5", "Ŧ-5");
     }
 
     #[test]

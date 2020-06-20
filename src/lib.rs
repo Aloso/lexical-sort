@@ -2,7 +2,7 @@
 //! means that non-ASCII characters such as `á` or `ß` are treated like their closest ASCII
 //! character: `á` is treated as `a`, `ß` is treated as `ss`, etc.
 //!
-//! The comparison is case-insensitive. Alphanumeric characters are sorted after all other
+//! Lexical comparisons are case-insensitive. Alphanumeric characters are sorted after all other
 //! characters (punctuation, whitespace, special characters, emojis, ...).
 //!
 //! It is possible to enable **natural sorting**, which also handles ASCII numbers. For example,
@@ -30,23 +30,26 @@
 //! assert_eq!(&strings, &[".", "50", "100", "B!", "é", "hello", "ß", "world"]);
 //! ```
 //!
-//! There are seven comparison functions:
+//! There are eight comparison functions:
 //!
-//! | Function                         | lexicographical | natural | skips non-alphanumeric characters |
-//! | -------------------------------- |:---------------:|:-------:|:---------------------------------:|
-//! | `only_alnum_cmp`                 |                 |         | yes                               |
-//! | `lexical_cmp`                    | yes             |         |                                   |
-//! | `lexical_only_alnum_cmp`         | yes             |         | yes                               |
-//! | `natural_cmp`                    |                 | yes     |                                   |
-//! | `natural_only_alnum_cmp`         |                 | yes     | yes                               |
-//! | `natural_lexical_cmp`            | yes             | yes     |                                   |
-//! | `natural_lexical_only_alnum_cmp` | yes             | yes     | yes                               |
+//! | Function                         | lexico­graphical | natural | skips non-alphanumeric chars |
+//! | -------------------------------- |:---------------:|:-------:|:----------------------------:|
+//! | `cmp`                            |                 |         |                              |
+//! | `only_alnum_cmp`                 |                 |         | yes                          |
+//! | `lexical_cmp`                    | yes             |         |                              |
+//! | `lexical_only_alnum_cmp`         | yes             |         | yes                          |
+//! | `natural_cmp`                    |                 | yes     |                              |
+//! | `natural_only_alnum_cmp`         |                 | yes     | yes                          |
+//! | `natural_lexical_cmp`            | yes             | yes     |                              |
+//! | `natural_lexical_­only_alnum_cmp` | yes             | yes     | yes                          |
+//!
+//! Note that only the functions that sort lexicographically are case insensitive.
 
 mod cmp;
 pub mod iter;
 
 pub use cmp::{
-    lexical_cmp, lexical_only_alnum_cmp, natural_cmp, natural_lexical_cmp,
+    cmp, lexical_cmp, lexical_only_alnum_cmp, natural_cmp, natural_lexical_cmp,
     natural_lexical_only_alnum_cmp, natural_only_alnum_cmp, only_alnum_cmp,
 };
 

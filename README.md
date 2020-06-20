@@ -2,7 +2,7 @@
 
 This is a library to compare and sort strings (or file paths) **lexicographically**. This means that non-ASCII characters such as `á` or `ß` are treated like their closest ASCII character: `á` is treated as `a`, `ß` is treated as `ss`, etc.
 
-The comparison is case-insensitive. Alphanumeric characters are sorted after all other characters (punctuation, whitespace, special characters, emojis, ...).
+Lexical comparisons are case-insensitive. Alphanumeric characters are sorted after all other characters (punctuation, whitespace, special characters, emojis, ...).
 
 It is possible to enable **natural sorting**, which also handles ASCII numbers. For example, `50` is less than `100` with natural sorting turned on. It's also possible to skip characters that aren't alphanumeric, so e.g. `f-5` is next to `f5`.
 
@@ -25,17 +25,20 @@ strings.string_sort_unstable(natural_lexical_cmp);
 assert_eq!(&strings, &[".", "50", "100", "B!", "é", "hello", "ß", "world"]);
 ```
 
-There are seven comparison functions:
+There are eight comparison functions:
 
-| Function                         | lexicographical | natural | skips non-alphanumeric characters |
-| -------------------------------- |:---------------:|:-------:|:---------------------------------:|
-| `only_alnum_cmp`                 |                 |         | yes                               |
-| `lexical_cmp`                    | yes             |         |                                   |
-| `lexical_only_alnum_cmp`         | yes             |         | yes                               |
-| `natural_cmp`                    |                 | yes     |                                   |
-| `natural_only_alnum_cmp`         |                 | yes     | yes                               |
-| `natural_lexical_cmp`            | yes             | yes     |                                   |
-| `natural_lexical_only_alnum_cmp` | yes             | yes     | yes                               |
+| Function                         | lexico­graphical | natural | skips non-alphanumeric chars |
+| -------------------------------- |:---------------:|:-------:|:----------------------------:|
+| `cmp`                            |                 |         |                              |
+| `only_alnum_cmp`                 |                 |         | yes                          |
+| `lexical_cmp`                    | yes             |         |                              |
+| `lexical_only_alnum_cmp`         | yes             |         | yes                          |
+| `natural_cmp`                    |                 | yes     |                              |
+| `natural_only_alnum_cmp`         |                 | yes     | yes                          |
+| `natural_lexical_cmp`            | yes             | yes     |                              |
+| `natural_lexical_­only_alnum_cmp` | yes             | yes     | yes                          |
+
+Note that only the functions that sort lexicographically are case insensitive.
 
 ## Characteristics
 
@@ -52,11 +55,11 @@ Note that comparisons are slower for strings where many characters at the start 
 
 These benchmarks were executed on an AMD A8-7600 Radeon R7 CPU with 4x 3.1GHz.
 
-The benchmark on the left compares 100 randomly generated strings with 5 to 20 characters, containing both ASCII and non-ASCII characters. Several of them need to be transliterated to multiple characters (e.g. `ß`, `æ`).
+- The first benchmark compares 100 randomly generated strings with 5 to 20 characters, containing both ASCII and non-ASCII characters.
+- The second benchmark also compares 100 randomly generated strings with 5 to 20 characters, but they're ASCII-only.
+- The last benchmark compares 100 randomly generated strings, each consisting of `"T-"` followed by 1 to 8 decimal digits. This is a stress test for natural sorting.
 
-The benchmark in the middle also comparse 100 randomly generated strings with 5 to 20 characters, but they are ASCII-only.
-
-The benchmark on the right comparse 100 randomly generated strings. Each string consists of `"T-"` followed by 1 to 8 decimal digits. This is a stress test for natural sorting.
+The last, dark blue bar is the string comparison function in the standard library:
 
 ![Diagrams](./docs/Diagrams.png)
 

@@ -1,7 +1,9 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{
+    black_box, criterion_group, criterion_main, measurement::WallTime, BenchmarkGroup, Criterion,
+};
 use lexical_sort::{
-    lexical_cmp, lexical_only_alnum_cmp, natural_cmp, natural_lexical_cmp,
-    natural_lexical_only_alnum_cmp,
+    cmp, lexical_cmp, lexical_only_alnum_cmp, natural_cmp, natural_lexical_cmp,
+    natural_lexical_only_alnum_cmp, natural_only_alnum_cmp, only_alnum_cmp,
 };
 use std::cmp::Ordering;
 
@@ -100,8 +102,12 @@ static ASCII_STRINGS: [&str; 100] = [
     "elvdTcu.uf+a_W?Rd\\j", "VN4r>2E6<v(esGn", "EBcp*BMN;$lDsn", "]6muXiTau+K)y",
 ];
 
+// Compare every string once with every string except itself
 #[inline(always)]
-fn for_all<'a, F: Fn(&'a str, &'a str) -> Ordering>(arr: &'a [&'a str], f: F) {
+fn for_all<'a, F>(arr: &'a [&'a str], f: F)
+where
+    F: Fn(&'a str, &'a str) -> Ordering,
+{
     for i in 0..100_usize {
         for j in (i..100).skip(1) {
             let l = black_box(arr[i]);
@@ -111,93 +117,54 @@ fn for_all<'a, F: Fn(&'a str, &'a str) -> Ordering>(arr: &'a [&'a str], f: F) {
     }
 }
 
-pub fn compare_strings(c: &mut Criterion) {
-    let mut group = c.benchmark_group("Random strings");
-
-    let strs = STRINGS;
-
+fn bench_all_functions(group: &mut BenchmarkGroup<WallTime>, strs: &[&str; 100]) {
     group.bench_function("native (std)", |b| {
-        b.iter(|| for_all(&strs, str::cmp));
+        b.iter(|| for_all(strs, str::cmp));
     });
     group.bench_function("natural (alphanumerical-sort)", |b| {
-        b.iter(|| for_all(&strs, |l, r| alphanumeric_sort::compare_str(l, r)));
+        b.iter(|| for_all(strs, alphanumeric_sort::compare_str));
     });
-    group.bench_function("natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_cmp));
+    group.bench_function("cmp", |b| {
+        b.iter(|| for_all(strs, cmp));
     });
-    group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, lexical_cmp));
+    group.bench_function("only alnum", |b| {
+        b.iter(|| for_all(strs, only_alnum_cmp));
     });
-    group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_lexical_cmp));
+    group.bench_function("lexical", |b| {
+        b.iter(|| for_all(strs, lexical_cmp));
     });
-    group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, lexical_only_alnum_cmp));
+    group.bench_function("lexical + only alnum", |b| {
+        b.iter(|| for_all(strs, lexical_only_alnum_cmp));
     });
-    group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_lexical_only_alnum_cmp));
+    group.bench_function("natural", |b| {
+        b.iter(|| for_all(strs, natural_cmp));
     });
-
-    group.finish();
+    group.bench_function("natural + only alnum", |b| {
+        b.iter(|| for_all(strs, natural_only_alnum_cmp));
+    });
+    group.bench_function("natural + lexical", |b| {
+        b.iter(|| for_all(strs, natural_lexical_cmp));
+    });
+    group.bench_function("natural + lexical + only alnum", |b| {
+        b.iter(|| for_all(strs, natural_lexical_only_alnum_cmp));
+    });
 }
 
-pub fn compare_numbers(c: &mut Criterion) {
-    let mut group = c.benchmark_group("Strings with numbers");
-
-    let strs = NUM_STRINGS;
-
-    group.bench_function("native (std)", |b| {
-        b.iter(|| for_all(&strs, str::cmp));
-    });
-    group.bench_function("natural (alphanumerical-sort)", |b| {
-        b.iter(|| for_all(&strs, |l, r| alphanumeric_sort::compare_str(l, r)));
-    });
-    group.bench_function("natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_cmp));
-    });
-    group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, lexical_cmp));
-    });
-    group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_lexical_cmp));
-    });
-    group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, lexical_only_alnum_cmp));
-    });
-    group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_lexical_only_alnum_cmp));
-    });
-
+pub fn compare_strings(c: &mut Criterion) {
+    let mut group = c.benchmark_group("Unicode strings");
+    bench_all_functions(&mut group, &STRINGS);
     group.finish();
 }
 
 pub fn compare_ascii(c: &mut Criterion) {
     let mut group = c.benchmark_group("ASCII strings");
+    bench_all_functions(&mut group, &ASCII_STRINGS);
+    group.finish();
+}
 
-    let strs = ASCII_STRINGS;
-
-    group.bench_function("native (std)", |b| {
-        b.iter(|| for_all(&strs, str::cmp));
-    });
-    group.bench_function("natural (alphanumerical-sort)", |b| {
-        b.iter(|| for_all(&strs, |l, r| alphanumeric_sort::compare_str(l, r)));
-    });
-    group.bench_function("natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_cmp));
-    });
-    group.bench_function("lexical (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, lexical_cmp));
-    });
-    group.bench_function("lexical + natural (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_lexical_cmp));
-    });
-    group.bench_function("lexical (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, lexical_only_alnum_cmp));
-    });
-    group.bench_function("lexical + natural (only alnum) (lexical-sort)", |b| {
-        b.iter(|| for_all(&strs, natural_lexical_only_alnum_cmp));
-    });
-
+pub fn compare_numbers(c: &mut Criterion) {
+    let mut group = c.benchmark_group("Strings with numbers");
+    bench_all_functions(&mut group, &NUM_STRINGS);
     group.finish();
 }
 
