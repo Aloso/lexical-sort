@@ -1,9 +1,9 @@
-//! This is a library to sort strings (or file paths) **lexicographically**. This means that
-//! non-ASCII characters such as `á` or `ß` are treated like their closest ASCII character: `á` is
-//! treated as `a`, `ß` is treated as `ss`, etc.
+//! This is a library to compare and sort strings (or file paths) **lexicographically**. This
+//! means that non-ASCII characters such as `á` or `ß` are treated like their closest ASCII
+//! character: `á` is treated as `a`, `ß` is treated as `ss`, etc.
 //!
-//! The sort is case-insensitive. Alphanumeric characters are sorted after all other characters
-//! (punctuation, whitespace, special characters, emojis, ...).
+//! The comparison is case-insensitive. Alphanumeric characters are sorted after all other
+//! characters (punctuation, whitespace, special characters, emojis, ...).
 //!
 //! It is possible to enable **natural sorting**, which also handles ASCII numbers. For example,
 //! `50` is less than `100` with natural sorting turned on. It's also possible to skip

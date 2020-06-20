@@ -179,7 +179,7 @@ pub fn natural_only_alnum_cmp(s1: &str, s2: &str) -> Ordering {
             }
             (Some(_), None) => return Ordering::Greater,
             (None, Some(_)) => return Ordering::Less,
-            (None, None) => return Ordering::Equal,
+            (None, None) => return s1.cmp(&s2),
         }
     }
 }
@@ -200,7 +200,7 @@ pub fn only_alnum_cmp(s1: &str, s2: &str) -> Ordering {
             }
             (Some(_), None) => return Ordering::Greater,
             (None, Some(_)) => return Ordering::Less,
-            (None, None) => return Ordering::Equal,
+            (None, None) => return s1.cmp(&s2),
         }
     }
 }
