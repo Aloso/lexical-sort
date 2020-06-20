@@ -9,7 +9,7 @@ It is possible to enable **natural sorting**, which also handles ASCII numbers. 
 If different strings have the same ASCII representation (e.g. `"Foo"` and `"fóò"`), it falls back to the default method from the standard library, so sorting is deterministic.
 
 <table><tr><td>
-<b>NOTE</b>: This crate doesn't attempt to be correct for every locale, but it should work reasonably well for a wide range of locales at a minimal performance cost.
+<b>NOTE</b>: This crate doesn't attempt to be correct for every locale, but it should work reasonably well for a wide range of locales, while providing excellent performance.
 </td></tr></table>
 
 ## Usage
