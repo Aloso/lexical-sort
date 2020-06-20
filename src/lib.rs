@@ -205,7 +205,7 @@ pub trait PathSort {
     /// Sorts the items using the provided comparison function.
     ///
     /// **This is a stable sort, which is often not required**.
-    /// You can use `string_sort_unstable` instead.
+    /// You can use `path_sort_unstable` instead.
     ///
     /// ## Example
     ///
@@ -248,7 +248,7 @@ pub trait PathSort {
     /// `to_string_lossy()` or `to_str().unwrap()` to convert a `Path` or `OsStr` to a `&str` first.
     ///
     /// **This is a stable sort, which is often not required**.
-    /// You can use `string_sort_unstable` instead.
+    /// You can use `path_sort_unstable` instead.
     ///
     /// ## Example
     ///
