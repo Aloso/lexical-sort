@@ -8,7 +8,7 @@ documentation = "https://docs.rs/lexical-sort"
 homepage = "https://lib.rs/crates/lexical-sort"
 repository = "https://github.com/Aloso/lexical-sort"
 readme = "README.md"
-exclude = ["deny.toml"]
+exclude = ["deny.toml", "docs/Diagrams.ods"]
 edition = "2018"
 
 keywords = [
