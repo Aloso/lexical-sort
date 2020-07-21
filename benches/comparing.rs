@@ -7,6 +7,10 @@ use lexical_sort::{
 };
 use std::cmp::Ordering;
 
+use rust_icu_ucol::UCollator;
+use rust_icu_ustring::UChar;
+use std::convert::TryFrom;
+
 // 100 auto-generated strings with a length between 5 and 20 characters
 //
 // Half of them have another string with a common prefix:
@@ -117,6 +121,26 @@ where
     }
 }
 
+// Compare every string once with every string except itself
+#[inline(always)]
+fn for_all_s<'a, F>(arr: &'a [&'a str], f: F)
+where
+    F: Fn(&UChar, &UChar) -> Ordering,
+{
+    let v: Vec<(&str, UChar)> = arr
+        .iter()
+        .map(|&s| (s, UChar::try_from(s).unwrap()))
+        .collect();
+
+    for i in 0..100_usize {
+        for j in (i..100).skip(1) {
+            let l = black_box(&v[i]);
+            let r = black_box(&v[j]);
+            black_box(f(&l.1, &r.1));
+        }
+    }
+}
+
 fn bench_all_functions(group: &mut BenchmarkGroup<WallTime>, strs: &[&str; 100]) {
     group.bench_function("native (std)", |b| {
         b.iter(|| for_all(strs, str::cmp));
@@ -147,6 +171,11 @@ fn bench_all_functions(group: &mut BenchmarkGroup<WallTime>, strs: &[&str; 100])
     });
     group.bench_function("natural + lexical + only alnum", |b| {
         b.iter(|| for_all(strs, natural_lexical_only_alnum_cmp));
+    });
+
+    let collator = UCollator::try_from("en").expect("collator");
+    group.bench_function("professional", |b| {
+        b.iter(|| for_all_s(strs, |a, b| collator.strcoll(a, b)));
     });
 }
 

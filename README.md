@@ -59,7 +59,9 @@ These benchmarks were executed on an AMD A8-7600 Radeon R7 CPU with 4x 3.1GHz.
 - The second benchmark also compares 100 randomly generated strings with 5 to 20 characters, but they're ASCII-only.
 - The last benchmark compares 100 randomly generated strings, each consisting of `"T-"` followed by 1 to 8 decimal digits. This is a stress test for natural sorting.
 
-The last, dark blue bar is the string comparison function in the standard library:
+The first, grey bar is from the `rust_icu` crate that provides bindings to the icu C library. This performs "proper" collation for English. It is faster in many cases, because it generates search keys up front to reduce the total amount of work.
+
+The last, dark blue bar is the string comparison function in the standard library.
 
 ![Diagrams](./docs/Diagrams.png)
 
