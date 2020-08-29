@@ -22,12 +22,14 @@
 //! To sort strings or paths, you can use the `StringSort` or `PathSort` trait:
 //!
 //! ```rust
+//! # #[cfg(feature = "std")] {
 //! use lexical_sort::{StringSort, natural_lexical_cmp};
 //!
 //! let mut strings = vec!["ß", "é", "100", "hello", "world", "50", ".", "B!"];
 //! strings.string_sort_unstable(natural_lexical_cmp);
 //!
 //! assert_eq!(&strings, &[".", "50", "100", "B!", "é", "hello", "ß", "world"]);
+//! # }
 //! ```
 //!
 //! There are eight comparison functions:
@@ -45,6 +47,8 @@
 //!
 //! Note that only the functions that sort lexicographically are case insensitive.
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
 mod cmp;
 pub mod iter;
 
@@ -53,7 +57,9 @@ pub use cmp::{
     natural_lexical_only_alnum_cmp, natural_only_alnum_cmp, only_alnum_cmp,
 };
 
-use std::{cmp::Ordering, path::Path};
+use core::cmp::Ordering;
+#[cfg(feature = "std")]
+use std::path::Path;
 
 /// A trait to sort strings. This is a convenient wrapper for the standard library sort functions.
 ///
@@ -201,6 +207,7 @@ impl<A: AsRef<str>> StringSort for [A] {
 /// ```
 ///
 /// If you want to sort regular strings, use the `StringSort` trait instead.
+#[cfg(feature = "std")]
 pub trait PathSort {
     /// Sorts the items using the provided comparison function.
     ///
@@ -295,6 +302,7 @@ pub trait PathSort {
         Map: FnMut(&str) -> &str;
 }
 
+#[cfg(feature = "std")]
 impl<A: AsRef<Path>> PathSort for [A] {
     fn path_sort(&mut self, mut cmp: impl FnMut(&str, &str) -> Ordering) {
         self.sort_by(|lhs, rhs| {
@@ -356,19 +364,22 @@ fn test_sort() {
         }};
     }
 
-    let strings = vec![
+    let strings = [
         "-", "-$", "-a", "100", "50", "a", "ä", "aa", "áa", "AB", "Ab", "ab", "AE", "ae", "æ", "af",
     ];
-    let strings_nat = vec![
+    let strings_nat = [
         "-", "-$", "-a", "50", "100", "a", "ä", "aa", "áa", "AB", "Ab", "ab", "AE", "ae", "æ", "af",
     ];
 
     assert_lexically_sorted!(string_sort, strings, natural = false);
     assert_lexically_sorted!(string_sort, strings_nat, natural = true);
 
-    let paths: Vec<&Path> = strings.iter().map(|s| Path::new(s)).collect();
-    let paths_nat: Vec<&Path> = strings_nat.iter().map(|s| Path::new(s)).collect();
+    #[cfg(feature = "std")]
+    {
+        let paths: Vec<&Path> = strings.iter().map(|s| Path::new(s)).collect();
+        let paths_nat: Vec<&Path> = strings_nat.iter().map(|s| Path::new(s)).collect();
 
-    assert_lexically_sorted!(path_sort, paths, natural = false);
-    assert_lexically_sorted!(path_sort, paths_nat, natural = true);
+        assert_lexically_sorted!(path_sort, paths, natural = false);
+        assert_lexically_sorted!(path_sort, paths_nat, natural = true);
+    }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "lexical-sort"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Ludwig Stecher <ludwig.stecher@gmx.de>"]
 description = "Sort Unicode strings lexically"
 categories = ["text-processing", "internationalization"]
@@ -11,13 +11,17 @@ readme = "README.md"
 exclude = ["deny.toml", "docs/Diagrams.ods"]
 edition = "2018"
 
-keywords = ["Unicode", "ASCII", "transliteration", "lexicographical", "sort"]
+keywords = ["Unicode", "transliteration", "lexicographical", "sort", "no_std"]
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+std = []
+default = ["std"]
+
 [dependencies]
-any_ascii = "0.1.5"
+any_ascii = "^0.1.6"
 
 [dev-dependencies]
 criterion = "0.3"

@@ -65,13 +65,17 @@ The last, dark blue bar is the string comparison function in the standard librar
 
 ![Diagrams](./docs/Diagrams.png)
 
+## `no_std` support
+
+This crate supports `no_std` environments. Note that you have to disable default features to compile without the standard library.
+
+This crate currently doesn't require an allocator, although this is likely going to change in the future.
+
 ## Contributing
 
 Contributions, bug reports and feature requests are welcome!
 
 If support for certain characters is missing, you can contribute them to the [any_ascii](https://github.com/hunterwb/any-ascii) crate.
-
-Let me know if you want to use this in `no_std`. It's certainly possible to add `no_std` support to this crate and its dependencies.
 
 ## License
 

@@ -8,7 +8,7 @@
 //! but I believe that it's quite efficient.
 
 use any_ascii::any_ascii_char;
-use std::iter::FusedIterator;
+use core::iter::FusedIterator;
 
 /// An iterator over one `char`, converted to lowercase
 /// and transliterated to ASCII, if it is an alphanumeric character
@@ -177,6 +177,7 @@ pub fn iterate_lexical_only_alnum(s: &'_ str) -> impl Iterator<Item = char> + '_
 }
 
 #[test]
+#[cfg(feature = "std")]
 fn test_iteration() {
     fn it(s: &'static str) -> String {
         iterate_lexical(s).collect()
@@ -193,6 +194,7 @@ fn test_iteration() {
 }
 
 #[test]
+#[cfg(feature = "std")]
 fn test_iteration_only_alnum() {
     fn it(s: &'static str) -> String {
         iterate_lexical_only_alnum(s).collect()
