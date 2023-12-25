@@ -166,13 +166,13 @@ fn combining_diacritical(&c: &char) -> bool {
 
 /// Returns an iterator over the characters of a string, converted to lowercase
 /// and transliterated to ASCII, if they're alphanumeric
-pub fn iterate_lexical(s: &'_ str) -> impl Iterator<Item = char> + '_ {
+pub fn iterate_lexical(s: &'_ str) -> impl DoubleEndedIterator<Item = char> + '_ {
     s.chars().flat_map(iterate_lexical_char)
 }
 
 /// Returns an iterator over the characters of a string, converted to lowercase
 /// and transliterated to ASCII. Non-alphanumeric characters are skipped
-pub fn iterate_lexical_only_alnum(s: &'_ str) -> impl Iterator<Item = char> + '_ {
+pub fn iterate_lexical_only_alnum(s: &'_ str) -> impl DoubleEndedIterator<Item = char> + '_ {
     s.chars().flat_map(iterate_lexical_char_only_alnum)
 }
 
